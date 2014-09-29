@@ -1,6 +1,10 @@
+import os
 import sys
+import fileinput
 import getopt
+import getpass
 import kanpyj
+import json
 
 def usage():
     sys.exit(2)
@@ -30,8 +34,20 @@ def main():
     except getopt.GetoptError as err:
         usage()
 
-    c = kanpyj.Client('http://localhost:8080',
-            'a8ae71fc7f1b507389f5254eb0b53afce810ecc127b49c59fed61a2a9c74')
+    host = None
+    apikey = None
+
+    rcfile = os.path.expanduser('~/.kancrc')
+    if os.path.exists(rcfile):
+        rc = open(rcfile).read()
+        rc_dict = json.loads(rc)
+        host = rc_dict['host']
+        apikey = rc_dict['apikey']
+
+    if host is None:
+        host = fileinput.input()
+        apikey = getpass.getpass('input your api key: ')
+    c = kanpyj.Client(host, apikey)
     if args[0] == 'project':
         if args[1] == 'list':
             list_items(c.get_all_projects(), project_to_str)
