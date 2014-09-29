@@ -9,15 +9,32 @@ import json
 def usage():
     sys.exit(2)
 
-def project_to_str(item):
-    return '{}\t{}'.format(item['id'], item['name'])
+def print_arr(arr, header = None):
+    arr = sorted(arr, key=lambda i: i[0])
+    arr.insert(0, header)
+    for i in range(len(arr[0])):
+        arr[0][i] = arr[0][i].upper()
+    max_len=[]
+    for row in arr:
+        for i in range(0, len(row)):
+            if i >= len(max_len):
+                max_len.append(0)
+            if max_len[i] < len(row[i]):
+                max_len[i] = len(row[i])
+    for row in arr:
+        for i in range(0, len(row)):
+            fmt = '{:<' + str(max_len[i] + 1) + '}' 
+            sys.stdout.write(fmt.format(row[i]))
+        sys.stdout.write('\n')
 
-def user_to_str(item):
-    return '{}\t{}\t{}'.format(item['id'], item['username'], item['name'])
-
-def list_items(items, func):
+def list_items(items, fields):
+    arr = []
     for i in items:
-        print func(i)
+        row = []
+        for f in fields:
+            row.append(i[f])
+        arr.append(row)
+    print_arr(arr, fields)
 
 def show_attr(item):
     max_len = 0
@@ -50,13 +67,13 @@ def main():
     c = kanpyj.Client(host, apikey)
     if args[0] == 'project':
         if args[1] == 'list':
-            list_items(c.get_all_projects(), project_to_str)
+            list_items(c.get_all_projects(), ['id', 'name'])
         elif args[1] == 'show':
             item = c.get_project_by_id(int(args[2]))
             show_attr(item)
     elif args[0] == 'user':
         if args[1] == 'list':
-            list_items(c.get_all_users(), user_to_str)
+            list_items(c.get_all_users(), ['id', 'username', 'name'])
         elif args[1] == 'show':
             show_attr(c.get_user(int(args[2])))
 
