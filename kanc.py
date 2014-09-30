@@ -80,6 +80,12 @@ def main():
             list_items(c.get_all_users(), ['id', 'username', 'name'], json_mode)
         elif args[1] == 'show':
             show_attr(c.get_user(int(args[2])), json_mode)
+    elif args[0] == 'task':
+        if args[1] == 'list':
+            item = c.get_all_tasks(int(args[2]), 1)
+            list_items(item)
+        elif args[1] == 'show':
+            show_attr(c.get_task(int(args[2])), json_mode)
 
 if __name__ == '__main__':
     main()
