@@ -9,8 +9,9 @@ import json
 def usage():
     sys.exit(2)
 
-def print_arr(arr, header = None):
-    arr = sorted(arr, key=lambda i: i[0])
+def print_arr(arr, header = None, sort=True):
+    if sort:
+        arr = sorted(arr, key=lambda i: i[0])
     arr.insert(0, header)
     for i in range(len(arr[0])):
         arr[0][i] = arr[0][i].upper()
@@ -47,6 +48,29 @@ def show_attr(item, json_mode):
         for i in item:
             arr.append([i, item[i]])
         print_arr(arr, ['name', 'value'])
+
+def show_board(board):
+    header = []
+    rows = []
+    max_tasks = 0
+    for col in board:
+        header.append(col['title'])
+        if max_tasks < len(col['tasks']):
+            max_tasks = len(col['tasks'])
+    for i in range(max_tasks):
+        row = []
+        for c in range(len(board)):
+            if i < len(board[c]['tasks']):
+                t = board[c]['tasks'][i]
+                title ='{:>03}. {}'.format(t['id'], t['title'])
+                if len(title) > 30:
+                    title = title[:27] + '...'
+                row.append(title)
+            else:
+                row.append('')
+        rows.append(row)
+
+    print_arr(rows, header, sort=False)
 
 def main():
     try:
@@ -86,6 +110,9 @@ def main():
             list_items(item)
         elif args[1] == 'show':
             show_attr(c.get_task(int(args[2])), json_mode)
+    elif args[0] == 'board':
+        if args[1] == 'show':
+            show_board(c.get_board(int(args[2])))
 
 if __name__ == '__main__':
     main()

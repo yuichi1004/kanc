@@ -554,6 +554,14 @@ smd = """
       "returns": {
         "type": "array"
       }
+    },
+    "getBoard": {
+      "parameters": [
+        {"name": "project_id", "type": "integer", "optional": false}
+      ],
+      "returns": {
+        "type": "array"
+      }
     }
   }
 }
