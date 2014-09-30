@@ -9,6 +9,29 @@ import json
 def usage():
     sys.exit(2)
 
+def print_row_with_border(row, col_size, row_type='data'):
+    vline = ''
+    if row_type == 'header' or row_type == 'footer':
+        for i in range(0, len(row)):
+            vline += '+'
+            for j in range(col_size[i]+1):
+                    vline += '-'
+        vline += '+'
+        print vline
+    if row_type == 'header' or row_type == 'data':
+        for i in range(0, len(row)):
+            fmt = '|{:<' + str(col_size[i] + 1) + '}'
+            sys.stdout.write(fmt.format(row[i]))
+        sys.stdout.write('|\n')
+    if row_type == 'header':
+        print vline
+
+def print_row_simple(row, col_size, row_type='data'):
+    for i in range(0, len(row)):
+        fmt = '{:<' + str(col_size[i] + 1) + '} '
+        sys.stdout.write(fmt.format(row[i]))
+    sys.stdout.write('\n')
+
 def print_arr(arr, header = None, sort=True, border=False):
     if sort:
         arr = sorted(arr, key=lambda i: i[0])
@@ -23,27 +46,14 @@ def print_arr(arr, header = None, sort=True, border=False):
             if row[i] is not None and max_len[i] < len(row[i]):
                 max_len[i] = len(row[i])
 
+    print_row_func = print_row_with_border if border else print_row_with_simple
     # header
     for row in arr[:1]:
-        for i in range(0, len(row)):
-            fmt = '|' if border else ''
-            fmt = fmt + '{:<' + str(max_len[i] + 1) + '}'
-            sys.stdout.write(fmt.format(row[i]))
-        sys.stdout.write('|\n' if border else '\n')
-        if border:
-            for i in range(0, len(row)):
-                sys.stdout.write('+' if border else ' ')
-                for j in range(max_len[i] + 1):
-                    sys.stdout.write('-')
-            sys.stdout.write('+\n' if border else '\n')
-
+        print_row_func(row, max_len, 'header')
     # body
     for row in arr[1:]:
-        for i in range(0, len(row)):
-            fmt = '|' if border else ''
-            fmt = fmt + '{:<' + str(max_len[i] + 1) + '}'
-            sys.stdout.write(fmt.format(row[i]))
-        sys.stdout.write('|\n' if border else '\n')
+        print_row_func(row, max_len, 'data')
+    print_row_func(arr[0], max_len, 'footer')
 
 def list_items(items, fields, json_mode):
     if json_mode:
