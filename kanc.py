@@ -9,7 +9,7 @@ import json
 def usage():
     sys.exit(2)
 
-def print_arr(arr, header = None, sort=True):
+def print_arr(arr, header = None, sort=True, border=False):
     if sort:
         arr = sorted(arr, key=lambda i: i[0])
     arr.insert(0, header)
@@ -22,11 +22,28 @@ def print_arr(arr, header = None, sort=True):
                 max_len.append(0)
             if row[i] is not None and max_len[i] < len(row[i]):
                 max_len[i] = len(row[i])
-    for row in arr:
+
+    # header
+    for row in arr[:1]:
         for i in range(0, len(row)):
-            fmt = '{:<' + str(max_len[i] + 1) + '}' 
+            fmt = '|' if border else ''
+            fmt = fmt + '{:<' + str(max_len[i] + 1) + '}'
             sys.stdout.write(fmt.format(row[i]))
-        sys.stdout.write('\n')
+        sys.stdout.write('|\n' if border else '\n')
+        if border:
+            for i in range(0, len(row)):
+                sys.stdout.write('+' if border else ' ')
+                for j in range(max_len[i] + 1):
+                    sys.stdout.write('-')
+            sys.stdout.write('+\n' if border else '\n')
+
+    # body
+    for row in arr[1:]:
+        for i in range(0, len(row)):
+            fmt = '|' if border else ''
+            fmt = fmt + '{:<' + str(max_len[i] + 1) + '}'
+            sys.stdout.write(fmt.format(row[i]))
+        sys.stdout.write('|\n' if border else '\n')
 
 def list_items(items, fields, json_mode):
     if json_mode:
@@ -70,7 +87,7 @@ def show_board(board):
                 row.append('')
         rows.append(row)
 
-    print_arr(rows, header, sort=False)
+    print_arr(rows, header, sort=False, border=True)
 
 def main():
     try:
