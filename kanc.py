@@ -27,27 +27,34 @@ def print_arr(arr, header = None):
             sys.stdout.write(fmt.format(row[i]))
         sys.stdout.write('\n')
 
-def list_items(items, fields):
-    arr = []
-    for i in items:
-        row = []
-        for f in fields:
-            row.append(i[f])
-        arr.append(row)
-    print_arr(arr, fields)
+def list_items(items, fields, json_mode):
+    if json_mode:
+        print json.dumps(items, indent=2)
+    else:
+        arr = []
+        for i in items:
+            row = []
+            for f in fields:
+                row.append(i[f])
+            arr.append(row)
+        print_arr(arr, fields)
 
-def show_attr(item):
-    arr = []
-    for i in item:
-        arr.append([i, item[i]])
-    print_arr(arr, ['name', 'value'])
+def show_attr(item, json_mode):
+    if json_mode:
+        print json.dumps(item, indent=2)
+    else:
+        arr = []
+        for i in item:
+            arr.append([i, item[i]])
+        print_arr(arr, ['name', 'value'])
 
 def main():
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hj:p')
+        opts, args = getopt.getopt(sys.argv[1:], 'hjp')
     except getopt.GetoptError as err:
         usage()
 
+    json_mode = ('-j', '') in opts
     host = None
     apikey = None
 
@@ -64,15 +71,15 @@ def main():
     c = kanpyj.Client(host, apikey)
     if args[0] == 'project':
         if args[1] == 'list':
-            list_items(c.get_all_projects(), ['id', 'name'])
+            list_items(c.get_all_projects(), ['id', 'name'], json_mode)
         elif args[1] == 'show':
             item = c.get_project_by_id(int(args[2]))
-            show_attr(item)
+            show_attr(item, json_mode)
     elif args[0] == 'user':
         if args[1] == 'list':
-            list_items(c.get_all_users(), ['id', 'username', 'name'])
+            list_items(c.get_all_users(), ['id', 'username', 'name'], json_mode)
         elif args[1] == 'show':
-            show_attr(c.get_user(int(args[2])))
+            show_attr(c.get_user(int(args[2])), json_mode)
 
 if __name__ == '__main__':
     main()
