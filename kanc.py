@@ -27,10 +27,11 @@ def print_row_with_border(row, col_size, row_type='data'):
         print vline
 
 def print_row_simple(row, col_size, row_type='data'):
-    for i in range(0, len(row)):
-        fmt = '{:<' + str(col_size[i] + 1) + '} '
-        sys.stdout.write(fmt.format(row[i]))
-    sys.stdout.write('\n')
+    if row_type == 'header' or row_type == 'data':
+        for i in range(0, len(row)):
+            fmt = '{:<' + str(col_size[i] + 1) + '} '
+            sys.stdout.write(fmt.format(row[i]))
+        sys.stdout.write('\n')
 
 def print_arr(arr, header = None, sort=True, border=False):
     if sort:
@@ -46,7 +47,7 @@ def print_arr(arr, header = None, sort=True, border=False):
             if row[i] is not None and max_len[i] < len(row[i]):
                 max_len[i] = len(row[i])
 
-    print_row_func = print_row_with_border if border else print_row_with_simple
+    print_row_func = print_row_with_border if border else print_row_simple
     # header
     for row in arr[:1]:
         print_row_func(row, max_len, 'header')
