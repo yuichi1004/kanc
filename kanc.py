@@ -19,7 +19,7 @@ def print_arr(arr, header = None):
         for i in range(0, len(row)):
             if i >= len(max_len):
                 max_len.append(0)
-            if max_len[i] < len(row[i]):
+            if row[i] is not None and max_len[i] < len(row[i]):
                 max_len[i] = len(row[i])
     for row in arr:
         for i in range(0, len(row)):
@@ -37,13 +37,10 @@ def list_items(items, fields):
     print_arr(arr, fields)
 
 def show_attr(item):
-    max_len = 0
-    for k in item:
-        if len(k) > max_len:
-            max_len = len(k)
-    for k in item:
-        fmt = '{:<' + str(max_len + 2) +  '}{}'
-        print fmt.format(k, item[k])
+    arr = []
+    for i in item:
+        arr.append([i, item[i]])
+    print_arr(arr, ['name', 'value'])
 
 def main():
     try:
