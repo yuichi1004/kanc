@@ -8,7 +8,7 @@ import kanpyj
 import json
 import subprocess
 import tempfile
-from kanc.command import factory
+from .command import factory
 
 def usage():
     sys.exit(2)
@@ -44,7 +44,8 @@ def main():
 
     rcfile = os.path.expanduser('~/.kancrc')
     if os.path.exists(rcfile):
-        rc = open(rcfile).read()
+        with open(rcfile) as f:
+            rc = f.read()
         rc_dict = json.loads(rc)
         host = rc_dict['host']
         apikey = rc_dict['apikey']
