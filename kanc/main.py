@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import os
 import sys
-import fileinput
 import getopt
 import getpass
 import kanpyj
@@ -140,7 +139,8 @@ def main():
         apikey = rc_dict['apikey']
 
     if host is None:
-        host = fileinput.input()
+        sys.stdout.write('input your host: ')
+        host = sys.stdin.readline()
         apikey = getpass.getpass('input your api key: ')
     c = kanpyj.Client(host, apikey)
     if args[0] == 'project':
