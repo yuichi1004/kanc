@@ -54,7 +54,7 @@ def main():
         sys.stdout.write('input your host: ')
         host = sys.stdin.readline()
         apikey = getpass.getpass('input your api key: ')
-    c = kanpyj.Client(host, apikey)
+    c = kanpyj.PatchedClient(host, apikey)
     
     cmd = factory.create(args[0], c)
     if cmd is None:

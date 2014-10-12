@@ -25,10 +25,12 @@ class RpcValidationError(RpcError):
 
 class ClientBase(object):
     def __init__(self, smd, host, username = None, password = None):
+        self.req_id = 0
         self.smd = smd
         self.host = host
         self.username = username
         self.password = password
+        self.strict_validation = True
         self.services = smd['services']
         for s in self.services:
             method_name = re.sub('([A-Z])', r'_\1', s).lower()
@@ -42,15 +44,46 @@ class ClientBase(object):
             self.url_opener = urllib2.build_opener(auth_handler)
     
     def validate_param(self, name, value, type):
+        if value is None:
+            return
+
+        if (self.strict_validation):
+            # Perform strict validation. Error if type not matched
+            if (type == 'integer'):
+                if not isinstance(value, int):
+                    raise RpcValidationError('{} needs to be integer'.format(name))
+            if (type == 'string'):
+                if not isinstance(value, str):
+                    raise RpcValidationError('{} needs to be string'.format(name))
+            if (type == 'boolean'):
+                if not isinstance(value, bool):
+                    raise RpcValidationError('{} needs to be boolean'.format(name))
+        else:
+            # Perform non-strict validation. Error if value cannot be cast
+            if (type == 'integer'):
+                try:
+                    int(value)
+                except ValueError:
+                    raise RpcValidationError('{} needs to be integer'.format(name))
+            if (type == 'string'):
+                try:
+                    str(value)
+                except ValueError:
+                    raise RpcValidationError('{} needs to be string'.format(name))
+            if (type == 'boolean'):
+                try:
+                    bool(value)
+                except ValueError:
+                    raise RpcValidationError('{} needs to be boolean'.format(name))
+
+    def cast_param(self, name, value, type):
         if (type == 'integer'):
-            if not isinstance(value, int):
-                raise RpcValidationError('{} needs to be integer'.format(name))
+            return int(value)
         if (type == 'string'):
-            if not isinstance(value, str):
-                raise RpcValidationError('{} needs to be string'.format(name))
+            return str(value)
         if (type == 'boolean'):
-            if not isinstance(value, bool):
-                raise RpcValidationError('{} needs to be boolean'.format(name))
+            return bool(value)
+        return value
 
     def request(self, method, service, args, kwargs):
         unchecked_args = kwargs
@@ -61,9 +94,11 @@ class ClientBase(object):
             unchecked_args[name] = args[i]
         for p in parameters:
             name = p['name']
-            if name in unchecked_args:
-                self.validate_param(name, unchecked_args[name], p['type'])
-                checked_args[name] = unchecked_args[name]
+            if unchecked_args.has_key(name):
+                if unchecked_args[name] is not None:
+                    self.validate_param(name, unchecked_args[name], p['type'])
+                    v = self.cast_param(name, unchecked_args[name], p['type'])
+                    checked_args[name] = v 
                 del unchecked_args[name]
             else:
                 if not p['optional']:
@@ -79,22 +114,25 @@ class ClientBase(object):
         payload = {
             'method': method,
             'jsonrpc': '2.0',
-            'id': 1,
+            'id': self.req_id,
         }
+        self.req_id = self.req_id + 1
         
         url = self.host + self.smd['target']
         req = None
         if transport == 'POST':
             if (checked_args is not None):
                 payload['params'] = checked_args 
+            payload = self.pre_request_send(payload)
             req = urllib2.Request(url, json.dumps(payload), headers)
         elif transport == 'GET':
             if (checked_args is not None):
                 paramstr = json.dumps(checked_args)
                 paramstr =  base64.b64encode(paramstr)
                 payload['params'] = paramstr
+            payload = self.pre_request_send(payload)
             query = urllib.urlencode(payload)
-            req = urllib2.Request(url + '?' + urllib.urlencode(payload),
+            req = urllib2.Request(url + '?' + query,
                     None, headers)
         else:
             raise RpcError('Unknown transport: ' + transport)
@@ -107,6 +145,16 @@ class ClientBase(object):
         if ('error' in j):
             raise RpcError(j['error'])
         return j['result']
+    
+    def pre_request_send(self, payload):
+        """ Pre-processor for request payload
+        Arguments:
+        payload -- request payload to be sent
+        
+        Returns:
+        Processed payload
+        """
+        return payload
 
 smd = """
 {
@@ -386,8 +434,7 @@ smd = """
     "updateUser": {
       "parameters": [
         {"name": "id", "type": "integer", "optional": false}, 
-        {"name": "username", "type": "string", "optional": false}, 
-        {"name": "password", "type": "string", "optional": false}, 
+        {"name": "username", "type": "string", "optional": true}, 
         {"name": "name", "type": "string", "optional": true}, 
         {"name": "email", "type": "string", "optional": true}, 
         {"name": "is_admin", "type": "integer", "optional": true}, 
@@ -568,6 +615,42 @@ smd = """
 """
 
 class Client(ClientBase):
+    """
+    Kanboard API client
+    """
     def __init__(self, host, key):
-        super(Client, self).__init__(json.loads(smd), host, 'jsonrpc', key)
+        smd_json = json.loads(smd)
+        super(Client, self).__init__(smd_json, host, 'jsonrpc', key)
+        self.strict_validation = False
+    
+    def remove_unused_params(self, method, params):
+        """ Remvoe unused parameters
+        Arguments:
+        params -- Given parameters
+
+        Returns:
+        Output parameters without unused params
+        """
+        checked_params = {}
+        for s in self.smd['services']:
+            if s == method:
+                service = self.smd['services'][s]
+                for p in service['parameters']:
+                    name = p['name']
+                    if name in params:
+                        checked_params[name] = params[name]
+        return checked_params
+
+class PatchedClient(Client):
+    """
+    Kanboard API client with compatibility patch
+    This is required for implementation bug of kanboard API
+    """
+    def __init__(self, host, key):
+        super(PatchedClient, self).__init__(host, key)
+
+    def pre_request_send(self, payload):
+        if payload['method'] == 'updateUser':
+            payload['params'] = {'values': payload['params']}
+        return payload
 

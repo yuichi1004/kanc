@@ -1,4 +1,5 @@
 from base import BaseCommand
+import json
 
 class UserCommand(BaseCommand):
     name = 'user'
@@ -13,4 +14,12 @@ class UserCommand(BaseCommand):
         elif args[0] == 'show':
             user_id = int(args[1])
             self.print_attr(self.client.get_user(user_id))
+        elif args[0] == 'edit':
+            user_id = int(args[1])
+            user = self.client.get_user(user_id)
+            user = self.client.remove_unused_params('updateUser', user)
+            update = self.edit_attr(user)
+            if update is not None:
+                self.client.update_user(**update)
+
 
