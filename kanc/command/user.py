@@ -6,6 +6,7 @@ class UserCommand(BaseCommand):
 
     def __init__(self, client):
         super(UserCommand, self).__init__(client)
+        self.param_order = ['id', 'user_id', 'username', 'name']
     
     def action(self, args):
         if args[0] == 'list':
@@ -23,7 +24,7 @@ class UserCommand(BaseCommand):
             user_id = int(args[1])
             user = self.client.get_user(user_id)
             user = self.client.remove_unused_params('updateUser', user)
-            update = self.edit_attr(user)
+            update = self.edit_attr(user, ['id', 'username'])
             if update is not None:
                 self.client.update_user(**update)
 

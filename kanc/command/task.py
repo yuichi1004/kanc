@@ -17,13 +17,13 @@ class TaskCommand(BaseCommand):
             self.print_attr(task)
         elif args[0] == 'create':
             task = self.client.create_empty_params('createTask')
-            task = self.edit_attr(task)
+            task = self.edit_attr(task, ['title', 'project_id'])
             if task is not None:
                 self.client.create_task(**task)
         elif args[0] == 'edit':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
-            update = self.edit_attr(task)
+            update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
 

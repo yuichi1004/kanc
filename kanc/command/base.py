@@ -24,12 +24,21 @@ class BaseCommand(object):
             arr.append(row)
         print tabulate(arr, headers=fields, tablefmt='simple')
 
-    def edit_attr(self, item):
+    def edit_attr(self, item, required_fields = []):
         editor = os.environ.get('EDITOR')
         if editor is None or editor == '':
             sys.stdout.write('Error: No editor is specified EDITOR')
-        
-        data = json.dumps(item, indent=4)
+ 
+        # create pretty json
+        data = "{\n"
+        for f in required_fields:
+            data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
+            del item[f]
+        data += "\n"
+        for f in item:
+            data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
+        data = data[0:len(data)-2]
+        data = data + "\n}\n"
 
         tmp_file = tempfile.mkstemp()
         f = file(tmp_file[1], 'w')
