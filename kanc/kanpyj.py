@@ -338,8 +338,8 @@ smd = """
         {"name": "color_id", "type": "integer", "optional": true}, 
         {"name": "column_id", "type": "integer", "optional": true}, 
         {"name": "description", "type": "string", "optional": true}, 
-        {"name": "owner_id", "integer": "string", "optional": true}, 
-        {"name": "creator_id", "integer": "string", "optional": true}, 
+        {"name": "owner_id", "type": "integer", "optional": true}, 
+        {"name": "creator_id", "type": "integer", "optional": true}, 
         {"name": "score", "type": "integer", "optional": true}, 
         {"name": "date_due", "type": "string", "optional": true}, 
         {"name": "category_id", "type": "integer", "optional": true}

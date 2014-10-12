@@ -15,4 +15,15 @@ class TaskCommand(BaseCommand):
             task_id = int(args[1])
             task = self.client.get_task(task_id)
             self.print_attr(task)
+        elif args[0] == 'create':
+            task = self.client.create_empty_params('createTask')
+            task = self.edit_attr(task)
+            if task is not None:
+                self.client.create_task(**task)
+        elif args[0] == 'edit':
+            task_id = int(args[1])
+            task = self.client.get_task(task_id)
+            update = self.edit_attr(task)
+            if update is not None:
+                self.client.update_task(**update)
 
