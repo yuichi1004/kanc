@@ -335,7 +335,7 @@ smd = """
       "parameters": [
         {"name": "title", "type": "string", "optional": false}, 
         {"name": "project_id", "type": "integer", "optional": false}, 
-        {"name": "color_id", "type": "integer", "optional": true}, 
+        {"name": "color_id", "type": "string", "optional": true}, 
         {"name": "column_id", "type": "integer", "optional": true}, 
         {"name": "description", "type": "string", "optional": true}, 
         {"name": "owner_id", "type": "integer", "optional": true}, 
@@ -352,12 +352,12 @@ smd = """
       "parameters": [
         {"name": "id", "type": "integer", "optional": false}, 
         {"name": "title", "type": "string", "optional": true}, 
-        {"name": "color_id", "type": "integer", "optional": true}, 
+        {"name": "color_id", "type": "string", "optional": true}, 
         {"name": "project_id", "type": "integer", "optional": true}, 
         {"name": "column_id", "type": "integer", "optional": true}, 
         {"name": "description", "type": "string", "optional": true}, 
-        {"name": "owner_id", "integer": "string", "optional": true}, 
-        {"name": "creator_id", "integer": "string", "optional": true}, 
+        {"name": "owner_id", "type": "integer", "optional": true}, 
+        {"name": "creator_id", "type": "string", "optional": true}, 
         {"name": "score", "type": "integer", "optional": true}, 
         {"name": "date_due", "type": "string", "optional": true}, 
         {"name": "category_id", "type": "integer", "optional": true}

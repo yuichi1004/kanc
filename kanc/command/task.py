@@ -23,6 +23,7 @@ class TaskCommand(BaseCommand):
         elif args[0] == 'edit':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
+            task = self.client.remove_unused_params('updateTask', task)
             update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
