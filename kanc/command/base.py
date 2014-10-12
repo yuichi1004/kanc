@@ -9,10 +9,13 @@ class BaseCommand(object):
     def __init__(self, client):
         self.client = client
 
-    def print_attr(self, item):
+    def print_attr(self, item, primary_fields=[]):
         arr = []
-        for i in item:
-            arr.append([i, item[i]])
+        for f in primary_fields:
+            arr.append([f, item[f]])
+        for f in item:
+            if f not in primary_fields:
+                arr.append([f, item[f]])
         print tabulate(arr, headers=['name', 'value'], tablefmt='simple')
 
     def print_items(self, items, fields):

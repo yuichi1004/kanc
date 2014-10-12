@@ -14,7 +14,7 @@ class TaskCommand(BaseCommand):
         elif args[0] == 'show':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
-            self.print_attr(task)
+            self.print_attr(task, ['id','title'])
         elif args[0] == 'create':
             task = self.client.create_empty_params('createTask')
             task = self.edit_attr(task, ['title', 'project_id'])
