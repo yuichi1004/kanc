@@ -626,6 +626,7 @@ class Client(ClientBase):
     def remove_unused_params(self, method, params):
         """ Remvoe unused parameters
         Arguments:
+        method -- Method name
         params -- Given parameters
 
         Returns:
@@ -641,6 +642,28 @@ class Client(ClientBase):
                         checked_params[name] = params[name]
         return checked_params
 
+    def create_empty_params(self, method):
+        """ Create parameters with empty values
+        Arguments:
+        method -- Method name
+
+        Returns:
+        empty parameter for the method 
+        """
+        params = {}
+        for s in self.smd['services']:
+            if s == method:
+                service = self.smd['services'][s]
+                for p in service['parameters']:
+                    if p['type'] == 'object':
+                        params[p['name']] = {}
+                    elif p['type'] == 'string':
+                        params[p['name']] = ""
+                    else:
+                        params[p['name']] = None
+        return params
+        
+
 class PatchedClient(Client):
     """
     Kanboard API client with compatibility patch
@@ -650,6 +673,9 @@ class PatchedClient(Client):
         super(PatchedClient, self).__init__(host, key)
 
     def pre_request_send(self, payload):
+        if payload['method'] == 'createUser':
+            payload['params']['confirmation'] = payload['params']['password']
+            payload['params'] = {'values': payload['params']}
         if payload['method'] == 'updateUser':
             payload['params'] = {'values': payload['params']}
         return payload
