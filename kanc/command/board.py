@@ -8,7 +8,10 @@ class BoardCommand(BaseCommand):
         super(BoardCommand, self).__init__(client)
 
     def help(self):
-        pass
+        print 'List of board subcommands'
+        print '------------'
+        print 'kanc board {project_id} - show board' 
+        print ''
     
     def action(self, args):
         board_id = 1
