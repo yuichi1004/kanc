@@ -11,7 +11,11 @@ class BoardCommand(BaseCommand):
         pass
     
     def action(self, args):
-        board = self.client.get_board(1)
+        board_id = 1
+        if len(args) > 0:
+            board_id = int(args[0])
+
+        board = self.client.get_board(board_id)
 
         header = []
         rows = []
