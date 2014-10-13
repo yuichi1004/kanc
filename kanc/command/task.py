@@ -8,9 +8,9 @@ class TaskCommand(BaseCommand):
     
     def action(self, args):
         if args[0] == 'list':
-            project_id = 1
+            project_id = int(args[1])
             tasks = self.client.get_all_tasks(project_id, 1)
-            self.print_items(tasks, ['id', 'name'])
+            self.print_items(tasks, ['id', 'title'])
         elif args[0] == 'show':
             task_id = int(args[1])
             task = self.client.get_task(task_id)

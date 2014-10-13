@@ -673,6 +673,8 @@ class PatchedClient(Client):
         super(PatchedClient, self).__init__(host, key)
 
     def pre_request_send(self, payload):
+        if payload['method'] == 'getAllTasks':
+            payload['params']['status'] = [payload['params']['status']]
         if payload['method'] == 'createUser':
             payload['params']['confirmation'] = payload['params']['password']
             payload['params'] = {'values': payload['params']}
