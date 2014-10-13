@@ -26,15 +26,18 @@ class TaskCommand(BaseCommand):
             result = self.join_attr(result, 'column_id', columns, 'id', 
                     {'title':'column'})
             self.print_items(result, ['id', 'title', 'assignee', 'column'])
+
         elif args[0] == 'show':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
             self.print_attr(task, ['id','title'])
+
         elif args[0] == 'create':
             task = self.client.create_empty_params('createTask')
             task = self.edit_attr(task, ['title', 'project_id'])
             if task is not None:
                 self.client.create_task(**task)
+
         elif args[0] == 'edit':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
@@ -42,6 +45,7 @@ class TaskCommand(BaseCommand):
             update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
+
         elif args[0] == 'move':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
@@ -63,4 +67,12 @@ class TaskCommand(BaseCommand):
                     column_id = col['id']
             self.client.move_task_position(project_id=project_id,
                     task_id=task_id, column_id=column_id, position=position)
+
+        elif args[0] == 'open':
+            task_id = int(args[1])
+            self.client.open_task(task_id)
+
+        elif args[0] == 'close':
+            task_id = int(args[1])
+            self.client.close_task(task_id)
 
