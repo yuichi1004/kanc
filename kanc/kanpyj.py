@@ -196,7 +196,7 @@ smd = """
         {"name": "id", "type": "integer", "optional": false}, 
         {"name": "name", "type": "string", "optional": false}, 
         {"name": "is_active", "type": "integer", "optional": true}, 
-        {"name": "token", "type": "integer", "optional": true}, 
+        {"name": "token", "type": "string", "optional": true}, 
         {"name": "is_public", "type": "integer", "optional": true}
       ],
       "returns": {

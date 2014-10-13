@@ -4,6 +4,7 @@ import json
 import subprocess
 import os
 import sys
+import re
 
 class BaseCommand(object):
     def __init__(self, client):
@@ -33,16 +34,21 @@ class BaseCommand(object):
             sys.stdout.write('Error: No editor is specified EDITOR')
  
         # create pretty json
-        data = "{\n"
+        data = "# Please edit the following fields\n"
+        data += "# Required field(s) '{}' need to be provided\n".format(
+                '\', \''.join(required_fields))
+        data += "# The optional field(s) can be removed to ignore\n"
+        data += "# Line start with '#' will be ignored\n\n"
+        data += "{\n"
         for f in required_fields:
-            data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
+            data += '    "{}": {},\n'.format(f, json.dumps(item[f]))
             del item[f]
         if len(item) == 0:
             data = data[0:len(data)-2]
         else:
             data += "\n"
             for f in item:
-                data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
+                data += '    "{}": {},\n'.format(f, json.dumps(item[f]))
             data = data[0:len(data)-2]
         data = data + "\n}\n"
 
@@ -59,6 +65,9 @@ class BaseCommand(object):
         if data == modified:
             sys.stderr.write('Abort: The data is not updated')
             return None
+        
+        modified = re.sub(r'#.*', '', modified)
+        print modified
         
         return json.loads(modified)
 
