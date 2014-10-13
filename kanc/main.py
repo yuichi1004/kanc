@@ -43,17 +43,31 @@ def main():
     apikey = None
 
     rcfile = os.path.expanduser('~/.kancrc')
+    
+    if args[0] == 'init':
+        if os.path.exists(rcfile):
+            while True:
+                ans = raw_input('.kanrc file already exists. Overwrite? [y/n]')
+                if ans == 'y':
+                    break
+                elif ans == 'n':
+                    print 'Abort creating .kanrc file'
+                    sys.exit(1)
+        sys.stdout.write('input your host: ')
+        host = sys.stdin.readline()
+        apikey = getpass.getpass('input your api key: ')
+
     if os.path.exists(rcfile):
         with open(rcfile) as f:
             rc = f.read()
         rc_dict = json.loads(rc)
         host = rc_dict['host']
         apikey = rc_dict['apikey']
+    else:
+        print '.kanrc file not found.'
+        print 'Please type "kanc init" to create .kanrc file first'
+        sys.exit(1)
 
-    if host is None:
-        sys.stdout.write('input your host: ')
-        host = sys.stdin.readline()
-        apikey = getpass.getpass('input your api key: ')
     c = kanpyj.PatchedClient(host, apikey)
     
     cmd = factory.create(args[0], c)
