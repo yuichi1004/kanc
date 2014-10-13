@@ -10,6 +10,16 @@ class BaseCommand(object):
     def __init__(self, client):
         self.client = client
 
+    def join_attr(self, item1, field1, item2, field2, target_fields):
+        for i1 in item1:
+            for t in target_fields:
+                i1[target_fields[t]] = None 
+            for i2 in item2:
+                if i1[field1] == i2[field2]:
+                    for t in target_fields:
+                        i1[target_fields[t]] = i2[t]
+        return item1
+
     def print_attr(self, item, primary_fields=[]):
         arr = []
         for f in primary_fields:

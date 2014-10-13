@@ -19,7 +19,13 @@ class TaskCommand(BaseCommand):
         if args[0] == 'list':
             project_id = int(args[1])
             tasks = self.client.get_all_tasks(project_id, 1)
-            self.print_items(tasks, ['id', 'title'])
+            users = self.client.get_all_users()
+            columns = self.client.get_columns(project_id)
+            result = self.join_attr(tasks, 'owner_id', users, 'id', 
+                    {'username':'assignee'})
+            result = self.join_attr(result, 'column_id', columns, 'id', 
+                    {'title':'column'})
+            self.print_items(result, ['id', 'title', 'assignee', 'column'])
         elif args[0] == 'show':
             task_id = int(args[1])
             task = self.client.get_task(task_id)
