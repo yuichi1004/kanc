@@ -12,4 +12,16 @@ class ProjectCommand(BaseCommand):
         elif args[0] == 'show':
             project_id = int(args[1])
             self.print_attr(self.client.get_project_by_id(project_id))
+        elif args[0] == 'create':
+            project = self.client.create_empty_params('createProject')
+            project = self.edit_attr(project, ['name'])
+            if project is not None:
+                self.client.create_project(**project)
+        elif args[0] == 'edit':
+            project_id = int(args[1])
+            project = self.client.get_project_by_id(project_id)
+            project = self.client.remove_unused_params('updateProject', project)
+            update = self.edit_attr(project, ['id', 'name'])
+            if update is not None:
+                self.client.update_project(**update)
 

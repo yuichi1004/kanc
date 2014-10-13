@@ -19,7 +19,7 @@ class UserCommand(BaseCommand):
             self.print_attr(user, primary_fields)
         elif args[0] == 'create':
             user = self.client.create_empty_params('createUser')
-            user = self.edit_attr(user)
+            user = self.edit_attr(user, ['username'])
             if user is not None:
                 self.client.create_user(**user)
         elif args[0] == 'edit':

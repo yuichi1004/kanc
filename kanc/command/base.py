@@ -37,10 +37,13 @@ class BaseCommand(object):
         for f in required_fields:
             data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
             del item[f]
-        data += "\n"
-        for f in item:
-            data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
-        data = data[0:len(data)-2]
+        if len(item) == 0:
+            data = data[0:len(data)-2]
+        else:
+            data += "\n"
+            for f in item:
+                data += '    "{}":{},\n'.format(f, json.dumps(item[f]))
+            data = data[0:len(data)-2]
         data = data + "\n}\n"
 
         tmp_file = tempfile.mkstemp()
