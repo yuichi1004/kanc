@@ -6,6 +6,15 @@ class TaskCommand(BaseCommand):
     def __init__(self, client):
         super(TaskCommand, self).__init__(client)
     
+    def find_col(self, project_id, col_name):
+        col = None
+        cols = self.client.get_columns(project_id)
+        for c in cols:
+            if c['title'].startswith(unicode(col_name)):
+                col = c
+                break
+        return col
+    
     def action(self, args):
         if args[0] == 'list':
             project_id = int(args[1])
@@ -27,4 +36,25 @@ class TaskCommand(BaseCommand):
             update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
+        elif args[0] == 'move':
+            task_id = int(args[1])
+            task = self.client.get_task(task_id)
+            project_id = task['project_id']
+            column_id = int(task['column_id'])
+            position = int(task['position'])
+            if args[2] == 'up':
+                position -= 1
+            elif args[2] == 'down':
+                position += 1
+            else:
+                col_name = args[2]
+                col = self.find_col(project_id, col_name)
+                if col is None:
+                    print 'Error: column {} not found'.format(col_name)
+                    return False
+                else:
+                    position = 1
+                    column_id = col['id']
+            self.client.move_task_position(project_id=project_id,
+                    task_id=task_id, column_id=column_id, position=position)
 
