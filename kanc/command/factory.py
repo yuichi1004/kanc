@@ -12,3 +12,10 @@ def create(name, client):
             return c(client)
     return None
 
+def create_all(client):
+    commands = [BoardCommand, UserCommand, ProjectCommand, TaskCommand]
+    created = []
+    for c in commands:
+        created += [c(client)]
+    return created
+

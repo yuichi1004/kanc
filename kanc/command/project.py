@@ -5,6 +5,15 @@ class ProjectCommand(BaseCommand):
 
     def __init__(self, client):
         super(ProjectCommand, self).__init__(client)
+        
+    def help(self):
+        print 'List of project subcommands'
+        print '------------'
+        print 'kanc project list - list all projects'
+        print 'kanc project show {project_id} - show a proejct'
+        print 'kanc project create - create new project'
+        print 'kanc project edit {project_id} - edit a project'
+        print ''
     
     def action(self, args):
         if args[0] == 'list':

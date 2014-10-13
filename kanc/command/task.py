@@ -6,6 +6,18 @@ class TaskCommand(BaseCommand):
     def __init__(self, client):
         super(TaskCommand, self).__init__(client)
     
+    def help(self):
+        print 'List of project subcommands'
+        print '------------'
+        print 'kanc task list {project_id} - list all tasks'
+        print 'kanc task show {task_id} - show a task'
+        print 'kanc task create - create new task'
+        print 'kanc task edit {task_id} - edit a task'
+        print 'kanc task move {task_id} up - move a task up on the board'
+        print 'kanc task move {task_id} down - move a task down on the board'
+        print 'kanc task move {task_id} {column} - move a task to other column'
+        print ''
+    
     def find_col(self, project_id, col_name):
         col = None
         cols = self.client.get_columns(project_id)

@@ -69,11 +69,16 @@ def main():
         sys.exit(1)
 
     c = kanpyj.PatchedClient(host, apikey)
-    
-    cmd = factory.create(args[0], c)
-    if cmd is None:
-        usage()
-    cmd.action(args[1:])
+
+    if args[0] == 'help':
+        cmds = factory.create_all(c)
+        for cmd in cmds:
+            cmd.help()
+    else:
+        cmd = factory.create(args[0], c)
+        if cmd is None:
+            usage()
+        cmd.action(args[1:])
 
 if __name__ == '__main__':
     main()

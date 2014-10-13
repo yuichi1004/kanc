@@ -7,6 +7,15 @@ class UserCommand(BaseCommand):
     def __init__(self, client):
         super(UserCommand, self).__init__(client)
         self.param_order = ['id', 'user_id', 'username', 'name']
+
+    def help(self):
+        print 'List of user subcommands'
+        print '------------'
+        print 'kanc user list - list all users'
+        print 'kanc user show {user_id} - show user'
+        print 'kanc user create - create new user'
+        print 'kanc user edit {user_id} - edit a user'
+        print ''
     
     def action(self, args):
         if args[0] == 'list':

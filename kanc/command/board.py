@@ -6,6 +6,9 @@ class BoardCommand(BaseCommand):
 
     def __init__(self, client):
         super(BoardCommand, self).__init__(client)
+
+    def help(self):
+        pass
     
     def action(self, args):
         board = self.client.get_board(1)

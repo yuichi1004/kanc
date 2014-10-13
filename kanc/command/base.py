@@ -10,6 +10,9 @@ class BaseCommand(object):
     def __init__(self, client):
         self.client = client
 
+    def help(self):
+        print 'help not available'
+
     def join_attr(self, item1, field1, item2, field2, target_fields):
         for i1 in item1:
             for t in target_fields:
