@@ -80,7 +80,6 @@ class BaseCommand(object):
             return None
         
         modified = re.sub(r'#.*', '', modified)
-        print modified
         
         return json.loads(modified)
 
