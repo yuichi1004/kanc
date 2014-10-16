@@ -11,6 +11,9 @@ import tempfile
 from .command import factory
 
 def usage():
+    cmds = factory.create_all(None)
+    for cmd in cmds:
+        cmd.help()
     sys.exit(2)
 
 def edit(data):
@@ -44,6 +47,10 @@ def main():
 
     rcfile = os.path.expanduser('~/.kancrc')
     
+    # Show help if no command specified
+    if len(args) == 0:
+        usage()
+
     if args[0] == 'init':
         if os.path.exists(rcfile):
             while True:
@@ -54,8 +61,12 @@ def main():
                     print 'Abort creating .kanrc file'
                     sys.exit(1)
         sys.stdout.write('input your host: ')
-        host = sys.stdin.readline()
+        host = sys.stdin.readline().rstrip()
         apikey = getpass.getpass('input your api key: ')
+        with open(rcfile, 'w') as f:
+            rc_dict = {'host': host, 'apikey': apikey, 'patched': True}
+            f.write(json.dumps(rc_dict, indent=2))
+        sys.exit(0)
 
     if os.path.exists(rcfile):
         with open(rcfile) as f:
@@ -63,17 +74,19 @@ def main():
         rc_dict = json.loads(rc)
         host = rc_dict['host']
         apikey = rc_dict['apikey']
+        patched = rc_dict['patched']
     else:
         print '.kanrc file not found.'
         print 'Please type "kanc init" to create .kanrc file first'
         sys.exit(1)
 
-    c = kanpyj.PatchedClient(host, apikey)
+    if patched:
+        c = kanpyj.PatchedClient(host, apikey)
+    else:
+        c = kanpyj.Client(host, apikey)
 
     if args[0] == 'help':
-        cmds = factory.create_all(c)
-        for cmd in cmds:
-            cmd.help()
+        usage()
     else:
         cmd = factory.create(args[0], c)
         if cmd is None:
