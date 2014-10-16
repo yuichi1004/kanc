@@ -6,6 +6,12 @@ import os
 import sys
 import re
 
+class CommandError(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+    def __str__(self):
+        return repr(self.msg)
+
 class BaseCommand(object):
     def __init__(self, client):
         self.client = client

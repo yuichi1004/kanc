@@ -1,4 +1,5 @@
 from base import BaseCommand
+from base import CommandError
 from tabulate import tabulate
 
 class BoardCommand(BaseCommand):

@@ -1,4 +1,5 @@
 from base import BaseCommand
+from base import CommandError
 import json
 
 class UserCommand(BaseCommand):
@@ -18,10 +19,17 @@ class UserCommand(BaseCommand):
         print ''
     
     def action(self, args):
+        if len(args) == 0:
+            raise CommandError('Subcommand not specified')
+
+        if args[0] == 'help':
+            self.help()
         if args[0] == 'list':
             self.print_items(self.client.get_all_users(), 
                     ['id', 'username', 'name'])
         elif args[0] == 'show':
+            if len(args) < 2:
+                raise CommandError("Needs to specify user_id")
             user_id = int(args[1])
             user = self.client.get_user(user_id)
             primary_fields = ['id', 'username', 'name']
@@ -32,11 +40,15 @@ class UserCommand(BaseCommand):
             if user is not None:
                 self.client.create_user(**user)
         elif args[0] == 'edit':
+            if len(args) < 2:
+                raise CommandError("Needs to specify user_id")
             user_id = int(args[1])
             user = self.client.get_user(user_id)
             user = self.client.remove_unused_params('updateUser', user)
             update = self.edit_attr(user, ['id', 'username'])
             if update is not None:
                 self.client.update_user(**update)
+        else:
+            raise CommandError("Unknown subcommand")
 
 

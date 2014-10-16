@@ -9,6 +9,7 @@ import json
 import subprocess
 import tempfile
 from .command import factory
+from .command.base import CommandError
 
 def usage():
     cmds = factory.create_all(None)
@@ -91,7 +92,10 @@ def main():
         cmd = factory.create(args[0], c)
         if cmd is None:
             usage()
-        cmd.action(args[1:])
+        try:
+            cmd.action(args[1:])
+        except CommandError:
+            cmd.help()
 
 if __name__ == '__main__':
     main()
