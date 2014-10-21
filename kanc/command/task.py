@@ -14,6 +14,7 @@ class TaskCommand(BaseCommand):
         print 'kanc task show {task_id} - show a task'
         print 'kanc task create - create new task'
         print 'kanc task edit {task_id} - edit a task'
+        print 'kanc task remove {task_id} {task_id} - remove tasks'
         print 'kanc task move {task_id} up - move a task up on the board'
         print 'kanc task move {task_id} down - move a task down on the board'
         print 'kanc task move {task_id} {column} - move a task to other column'
@@ -69,6 +70,14 @@ class TaskCommand(BaseCommand):
             update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
+
+        elif args[0] == 'remove':
+            if len(args) < 2:
+                raise CommandError('task_id not specified')
+            for t in args[1:]:
+                task_id = int(t)
+                if not self.client.remove_task(task_id):
+                    raise CommandError('could not delete task')
 
         elif args[0] == 'move':
             if len(args) < 2:
