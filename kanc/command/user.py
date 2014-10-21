@@ -16,6 +16,7 @@ class UserCommand(BaseCommand):
         print 'kanc user show {user_id} - show user'
         print 'kanc user create - create new user'
         print 'kanc user edit {user_id} - edit a user'
+        print 'kanc user remove {user_id_1} {user_id_2} ... - remove users'
         print ''
     
     def action(self, args):
@@ -48,6 +49,14 @@ class UserCommand(BaseCommand):
             update = self.edit_attr(user, ['id', 'username'])
             if update is not None:
                 self.client.update_user(**update)
+        
+        elif args[0] == 'remove':
+            if len(args) < 2:
+                raise CommandError('user_id not specified')
+            for u in args[1:]:
+                user_id = int(u)
+                if not self.client.remove_user(user_id):
+                    raise CommandError('could not delete user')
         else:
             raise CommandError("Unknown subcommand")
 
