@@ -19,41 +19,45 @@ class UserCommand(BaseCommand):
         print 'kanc user remove {user_id_1} {user_id_2} ... - remove users'
         print ''
     
-    def action(self, args):
-        if len(args) == 0:
+    def action(self, subcmd, args):
+        if subcmd is None:
             raise CommandError('Subcommand not specified')
 
-        if args[0] == 'help':
+        if subcmd == 'help':
             self.help()
-        if args[0] == 'list':
+
+        if subcmd == 'list':
             self.print_items(self.client.get_all_users(), 
                     ['id', 'username', 'name'])
-        elif args[0] == 'show':
-            if len(args) < 2:
+
+        elif subcmd == 'show':
+            if len(args) < 1:
                 raise CommandError("Needs to specify user_id")
-            user_id = int(args[1])
+            user_id = int(args[0])
             user = self.client.get_user(user_id)
             primary_fields = ['id', 'username', 'name']
             self.print_attr(user, primary_fields)
-        elif args[0] == 'create':
+
+        elif subcmd == 'create':
             user = self.client.create_empty_params('createUser')
             user = self.edit_attr(user, ['username'])
             if user is not None:
                 self.client.create_user(**user)
-        elif args[0] == 'edit':
-            if len(args) < 2:
+
+        elif subcmd == 'edit':
+            if len(args) < 1:
                 raise CommandError("Needs to specify user_id")
-            user_id = int(args[1])
+            user_id = int(args[0])
             user = self.client.get_user(user_id)
             user = self.client.remove_unused_params('updateUser', user)
             update = self.edit_attr(user, ['id', 'username'])
             if update is not None:
                 self.client.update_user(**update)
         
-        elif args[0] == 'remove':
-            if len(args) < 2:
+        elif subcmd == 'remove':
+            if len(args) < 1:
                 raise CommandError('user_id not specified')
-            for u in args[1:]:
+            for u in args[0:]:
                 user_id = int(u)
                 if not self.client.remove_user(user_id):
                     raise CommandError('could not delete user')

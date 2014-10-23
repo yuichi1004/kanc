@@ -31,14 +31,14 @@ class TaskCommand(BaseCommand):
                 break
         return col
     
-    def action(self, args):
-        if len(args) == 0:
+    def action(self, subcmd, args):
+        if subcmd is None:
             raise CommandError('Subcommand not specified')
 
-        if args[0] == 'list':
-            if len(args) < 2:
+        if subcmd == 'list':
+            if len(args) < 1:
                 raise CommandError('project_id not specified')
-            project_id = int(args[1])
+            project_id = int(args[0])
             tasks = self.client.get_all_tasks(project_id, 1)
             users = self.client.get_all_users()
             columns = self.client.get_columns(project_id)
@@ -48,53 +48,53 @@ class TaskCommand(BaseCommand):
                     {'title':'column'})
             self.print_items(result, ['id', 'title', 'assignee', 'column'])
 
-        elif args[0] == 'show':
-            if len(args) < 2:
+        elif subcmd == 'show':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[1])
+            task_id = int(args[0])
             task = self.client.get_task(task_id)
             self.print_attr(task, ['id','title'])
 
-        elif args[0] == 'create':
+        elif subcmd == 'create':
             task = self.client.create_empty_params('createTask')
             task = self.edit_attr(task, ['title', 'project_id'])
             if task is not None:
                 self.client.create_task(**task)
 
-        elif args[0] == 'edit':
-            if len(args) < 2:
+        elif subcmd == 'edit':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[1])
+            task_id = int(args[0])
             task = self.client.get_task(task_id)
             task = self.client.remove_unused_params('updateTask', task)
             update = self.edit_attr(task, ['id','title'])
             if update is not None:
                 self.client.update_task(**update)
 
-        elif args[0] == 'remove':
-            if len(args) < 2:
+        elif subcmd == 'remove':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
             for t in args[1:]:
                 task_id = int(t)
                 if not self.client.remove_task(task_id):
                     raise CommandError('could not delete task')
 
-        elif args[0] == 'move':
-            if len(args) < 2:
+        elif subcmd == 'move':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
-            if len(args) < 3:
+            if len(args) < 2:
                 raise CommandError('move destination not specified')
-            task_id = int(args[1])
+            task_id = int(args[0])
             task = self.client.get_task(task_id)
             project_id = task['project_id']
             column_id = int(task['column_id'])
             position = int(task['position'])
-            if args[2] == 'up':
+            if args[1] == 'up':
                 position -= 1
-            elif args[2] == 'down':
+            elif args[1] == 'down':
                 position += 1
             else:
-                col_name = args[2]
+                col_name = args[1]
                 col = self.find_col(project_id, col_name)
                 if col is None:
                     print 'Error: column {} not found'.format(col_name)
@@ -105,16 +105,16 @@ class TaskCommand(BaseCommand):
             self.client.move_task_position(project_id=project_id,
                     task_id=task_id, column_id=column_id, position=position)
 
-        elif args[0] == 'open':
-            if len(args) < 2:
+        elif subcmd == 'open':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[1])
+            task_id = int(args[0])
             self.client.open_task(task_id)
 
-        elif args[0] == 'close':
-            if len(args) < 2:
+        elif subcmd == 'close':
+            if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[1])
+            task_id = int(args[0])
             self.client.close_task(task_id)
         else:
             raise CommandError('Unknown subcommand specified')

@@ -37,12 +37,7 @@ def edit(data):
     return updated_data
 
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hjp')
-    except getopt.GetoptError as err:
-        usage()
-
-    json_mode = ('-j', '') in opts
+    args = sys.argv[1:]
     host = None
     apikey = None
 
@@ -52,7 +47,16 @@ def main():
     if len(args) == 0:
         usage()
 
-    if args[0] == 'init':
+    # Get command and subcommand
+    cmd_name = args[0]
+    subcmd_name = None
+    cmd_args = []
+    if len(args) > 1:
+        subcmd_name = args[1]
+    if len(args) > 2:
+        cmd_args = args[2:]
+
+    if cmd_name == 'init':
         if os.path.exists(rcfile):
             while True:
                 ans = raw_input('.kanrc file already exists. Overwrite? [y/n]')
@@ -86,16 +90,16 @@ def main():
     else:
         c = kanpyj.Client(host, apikey)
 
-    if args[0] == 'help':
+    if cmd_name == 'help':
         usage()
-    else:
-        cmd = factory.create(args[0], c)
-        if cmd is None:
-            usage()
-        try:
-            cmd.action(args[1:])
-        except CommandError:
-            cmd.help()
+
+    cmd = factory.create(cmd_name, c)
+    if cmd is None:
+        usage()
+    try:
+        cmd.action(subcmd_name, cmd_args)
+    except CommandError:
+        cmd.help()
 
 if __name__ == '__main__':
     main()

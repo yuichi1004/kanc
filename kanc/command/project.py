@@ -17,39 +17,39 @@ class ProjectCommand(BaseCommand):
         print 'kanc project remove {project_id} {project_id} - remove projects'
         print ''
     
-    def action(self, args):
-        if len(args) == 0:
+    def action(self, subcmd, args):
+        if subcmd == 0:
             raise CommandError('Subcommand not specified')
 
-        if args[0] == 'list':
+        if subcmd == 'list':
             self.print_items(self.client.get_all_projects(), ['id', 'name'])
 
-        elif args[0] == 'show':
-            if len(args) < 2:
+        elif subcmd == 'show':
+            if len(args) < 1:
                 raise CommandError('project_id not specified')
-            project_id = int(args[1])
+            project_id = int(args[0])
             self.print_attr(self.client.get_project_by_id(project_id))
 
-        elif args[0] == 'create':
+        elif subcmd == 'create':
             project = self.client.create_empty_params('createProject')
             project = self.edit_attr(project, ['name'])
             if project is not None:
                 self.client.create_project(**project)
 
-        elif args[0] == 'edit':
-            if len(args) < 2:
+        elif subcmd == 'edit':
+            if len(args) < 1:
                 raise CommandError('project_id not specified')
-            project_id = int(args[1])
+            project_id = int(args[0])
             project = self.client.get_project_by_id(project_id)
             project = self.client.remove_unused_params('updateProject', project)
             update = self.edit_attr(project, ['id', 'name'])
             if update is not None:
                 self.client.update_project(**update)
         
-        elif args[0] == 'remove':
-            if len(args) < 2:
+        elif subcmd == 'remove':
+            if len(args) < 1:
                 raise CommandError('project_id not specified')
-            for p in args[1:]:
+            for p in args:
                 project_id = int(p)
                 if not self.client.remove_project(project_id):
                     raise CommandError('could not delete project')

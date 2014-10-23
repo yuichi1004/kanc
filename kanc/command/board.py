@@ -37,10 +37,10 @@ class BoardCommand(BaseCommand):
         print 'kanc board {project_id} - show board' 
         print ''
     
-    def action(self, args):
+    def action(self, subcmd, args):
         board_id = 1
-        if len(args) > 0:
-            board_id = int(args[0])
+        if subcmd is not None:
+            board_id = int(subcmd)
 
         board = self.client.get_board(board_id)
 
