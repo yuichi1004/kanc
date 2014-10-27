@@ -13,8 +13,9 @@ class CommandError(Exception):
         return repr(self.msg)
 
 class BaseCommand(object):
-    def __init__(self, client):
+    def __init__(self, client, rcfile):
         self.client = client
+        self.rcfile = rcfile
 
     def help(self):
         print 'help not available'

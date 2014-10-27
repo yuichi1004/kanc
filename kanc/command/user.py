@@ -5,8 +5,8 @@ import json
 class UserCommand(BaseCommand):
     name = 'user'
 
-    def __init__(self, client):
-        super(UserCommand, self).__init__(client)
+    def __init__(self, client, rcfile):
+        super(UserCommand, self).__init__(client, rcfile)
         self.param_order = ['id', 'user_id', 'username', 'name']
 
     def help(self):

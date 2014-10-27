@@ -11,8 +11,36 @@ import tempfile
 from .command import factory
 from .command.base import CommandError
 
+class KancResourceFile:
+    def __init__(self, filename):
+        self.filename = filename
+        self.rc_dict = {}
+
+    def exists(self):
+        return os.path.exists(self.filename)
+
+    def read(self):
+        if os.path.exists(self.filename):
+            with open(self.filename) as f:
+                rc = f.read()
+            self.rc_dict = json.loads(rc)
+        else:
+            print '.kanrc file not found.'
+            print 'Please type "kanc init" to create .kanrc file first'
+            sys.exit(1)
+
+    def save(self):
+        with open(self.filename, 'w') as f:
+            f.write(json.dumps(self.rc_dict, indent=2))
+
+    def get(self, key):
+        return self.rc_dict[key]
+    
+    def set(self, key, val):
+        self.rc_dict[key] = val
+
 def usage():
-    cmds = factory.create_all(None)
+    cmds = factory.create_all(None, None)
     for cmd in cmds:
         cmd.help()
     sys.exit(2)
@@ -41,7 +69,7 @@ def main():
     host = None
     apikey = None
 
-    rcfile = os.path.expanduser('~/.kancrc')
+    rcfile = KancResourceFile(os.path.expanduser('~/.kancrc'))
     
     # Show help if no command specified
     if len(args) == 0:
@@ -57,7 +85,7 @@ def main():
         cmd_args = args[2:]
 
     if cmd_name == 'init':
-        if os.path.exists(rcfile):
+        if rcfile.exists():
             while True:
                 ans = raw_input('.kanrc file already exists. Overwrite? [y/n]')
                 if ans == 'y':
@@ -68,24 +96,23 @@ def main():
         sys.stdout.write('input your host: ')
         host = sys.stdin.readline().rstrip()
         apikey = getpass.getpass('input your api key: ')
-        with open(rcfile, 'w') as f:
-            rc_dict = {'host': host, 'apikey': apikey, 'patched': True}
-            f.write(json.dumps(rc_dict, indent=2))
+        rcfile.set('host', host)
+        rcfile.set('apikey', apikey)
+        rcfile.set('patched', True)
+        rcfile.set('currentProject', 1)
+        rcfile.save()
         sys.exit(0)
 
-    if os.path.exists(rcfile):
-        with open(rcfile) as f:
-            rc = f.read()
-        rc_dict = json.loads(rc)
-        host = rc_dict['host']
-        apikey = rc_dict['apikey']
-        patched = rc_dict['patched']
+    if rcfile.exists():
+        rcfile.read()
+        host = rcfile.get('host')
+        apikey = rcfile.get('apikey')
     else:
         print '.kanrc file not found.'
         print 'Please type "kanc init" to create .kanrc file first'
         sys.exit(1)
 
-    if patched:
+    if rcfile.get('patched'):
         c = kanpyj.PatchedClient(host, apikey)
     else:
         c = kanpyj.Client(host, apikey)
@@ -93,7 +120,7 @@ def main():
     if cmd_name == 'help':
         usage()
 
-    cmd = factory.create(cmd_name, c)
+    cmd = factory.create(cmd_name, c, rcfile)
     if cmd is None:
         usage()
     try:

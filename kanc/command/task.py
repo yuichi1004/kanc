@@ -4,13 +4,13 @@ from base import CommandError
 class TaskCommand(BaseCommand):
     name = 'task'
 
-    def __init__(self, client):
-        super(TaskCommand, self).__init__(client)
+    def __init__(self, client, rcfile):
+        super(TaskCommand, self).__init__(client, rcfile)
     
     def help(self):
         print 'List of project subcommands'
         print '------------'
-        print 'kanc task list {project_id} - list all tasks'
+        print 'kanc task list - list all tasks in current project'
         print 'kanc task show {task_id} - show a task'
         print 'kanc task create - create new task'
         print 'kanc task edit {task_id} - edit a task'
@@ -36,9 +36,7 @@ class TaskCommand(BaseCommand):
             raise CommandError('Subcommand not specified')
 
         if subcmd == 'list':
-            if len(args) < 1:
-                raise CommandError('project_id not specified')
-            project_id = int(args[0])
+            project_id = int(self.rcfile.get('currentProject'))
             tasks = self.client.get_all_tasks(project_id, 1)
             users = self.client.get_all_users()
             columns = self.client.get_columns(project_id)

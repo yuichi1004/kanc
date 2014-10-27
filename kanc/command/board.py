@@ -28,20 +28,17 @@ def terminal_size():
 class BoardCommand(BaseCommand):
     name = 'board'
 
-    def __init__(self, client):
-        super(BoardCommand, self).__init__(client)
+    def __init__(self, client, rcfile):
+        super(BoardCommand, self).__init__(client, rcfile)
 
     def help(self):
         print 'List of board subcommands'
         print '------------'
-        print 'kanc board {project_id} - show board' 
+        print 'kanc board - show board of current project' 
         print ''
     
     def action(self, subcmd, args):
-        board_id = 1
-        if subcmd is not None:
-            board_id = int(subcmd)
-
+        board_id = self.rcfile.get('currentProject')
         board = self.client.get_board(board_id)
 
         header = []

@@ -4,13 +4,15 @@ from base import CommandError
 class ProjectCommand(BaseCommand):
     name = 'project'
 
-    def __init__(self, client):
-        super(ProjectCommand, self).__init__(client)
+    def __init__(self, client, rcfile):
+        super(ProjectCommand, self).__init__(client, rcfile)
         
     def help(self):
         print 'List of project subcommands'
         print '------------'
         print 'kanc project list - list all projects'
+        print 'kanc project current - show current project'
+        print 'kanc project swtich {project_id} - switch project'
         print 'kanc project show {project_id} - show a proejct'
         print 'kanc project create - create new project'
         print 'kanc project edit {project_id} - edit a project'
@@ -23,6 +25,24 @@ class ProjectCommand(BaseCommand):
 
         if subcmd == 'list':
             self.print_items(self.client.get_all_projects(), ['id', 'name'])
+
+        elif subcmd == 'current':
+            project_id = int(self.rcfile.get('currentProject'))
+            project = self.client.get_project_by_id(project_id)
+            if project is None:
+                raise CommandError('Project not found')
+            print '* Current Project: {0}.{1}'.format(project_id, project['name'])
+        
+        elif subcmd == 'switch':
+            if len(args) < 1:
+                raise CommandError('project_id not specified')
+            project_id = int(args[0])
+            project = self.client.get_project_by_id(project_id)
+            if project is None:
+                raise CommandError('Project not found')
+            self.rcfile.set('currentProject', project_id)
+            self.rcfile.save()
+            print '* Switch project to: {0}.{1}'.format(project_id, project['name'])
 
         elif subcmd == 'show':
             if len(args) < 1:
