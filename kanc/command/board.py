@@ -37,7 +37,7 @@ class BoardCommand(BaseCommand):
         print 'kanc board - show board of current project' 
         print ''
     
-    def action(self, subcmd, args):
+    def action(self, subcmd, opts, args):
         board_id = self.rcfile.get('currentProject')
         board = self.client.get_board(board_id)
 

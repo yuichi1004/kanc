@@ -78,11 +78,11 @@ def main():
     # Get command and subcommand
     cmd_name = args[0]
     subcmd_name = None
-    cmd_args = []
+    args_and_opts = []
     if len(args) > 1:
         subcmd_name = args[1]
     if len(args) > 2:
-        cmd_args = args[2:]
+        args_and_opts = args[2:]
 
     if cmd_name == 'init':
         if rcfile.exists():
@@ -124,7 +124,9 @@ def main():
     if cmd is None:
         usage()
     try:
-        cmd.action(subcmd_name, cmd_args)
+        getopt_args = cmd.getopt_args(subcmd_name)
+        cmd_opts, cmd_args = getopt.getopt(args_and_opts, getopt_args)
+        cmd.action(subcmd_name, cmd_opts, cmd_args)
     except CommandError:
         cmd.help()
 

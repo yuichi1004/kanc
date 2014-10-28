@@ -22,6 +22,11 @@ class TaskCommand(BaseCommand):
         print 'kanc task close {task_id} - close a task'
         print ''
     
+    def getopt_args(self, subcmd):
+        if subcmd == 'list':
+            return 'l'
+        return ''
+    
     def find_col(self, project_id, col_name):
         col = None
         cols = self.client.get_columns(project_id)
@@ -31,20 +36,27 @@ class TaskCommand(BaseCommand):
                 break
         return col
     
-    def action(self, subcmd, args):
+    def action(self, subcmd, opts, args):
         if subcmd is None:
             raise CommandError('Subcommand not specified')
 
         if subcmd == 'list':
+            detailed_list = False
+            for o in opts:
+                if o[0] == '-l':
+                    detailed_list = True
             project_id = int(self.rcfile.get('currentProject'))
             tasks = self.client.get_all_tasks(project_id, 1)
-            users = self.client.get_all_users()
-            columns = self.client.get_columns(project_id)
-            result = self.join_attr(tasks, 'owner_id', users, 'id', 
-                    {'username':'assignee'})
-            result = self.join_attr(result, 'column_id', columns, 'id', 
-                    {'title':'column'})
-            self.print_items(result, ['id', 'title', 'assignee', 'column'])
+            if detailed_list:
+                users = self.client.get_all_users()
+                columns = self.client.get_columns(project_id)
+                result = self.join_attr(tasks, 'owner_id', users, 'id', 
+                        {'username':'assignee'})
+                result = self.join_attr(result, 'column_id', columns, 'id', 
+                        {'title':'column'})
+                self.print_items(result, ['id', 'title', 'assignee', 'column'])
+            else:
+                self.print_items(tasks, ['id', 'title'], False)
 
         elif subcmd == 'show':
             if len(args) < 1:

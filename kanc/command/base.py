@@ -20,6 +20,9 @@ class BaseCommand(object):
     def help(self):
         print 'help not available'
 
+    def getopt_args(self, subcmd):
+        return ''
+
     def join_attr(self, item1, field1, item2, field2, target_fields):
         for i1 in item1:
             for t in target_fields:
@@ -39,14 +42,17 @@ class BaseCommand(object):
                 arr.append([f, item[f]])
         print tabulate(arr, headers=['name', 'value'], tablefmt='simple')
 
-    def print_items(self, items, fields):
+    def print_items(self, items, fields, show_header=True):
         arr = []
         for i in items:
             row = []
             for f in fields:
                 row.append(i[f])
             arr.append(row)
-        print tabulate(arr, headers=fields, tablefmt='simple')
+        if show_header:
+            print tabulate(arr, headers=fields, tablefmt='simple')
+        else:
+            print tabulate(arr, tablefmt='plain')
 
     def edit_attr(self, item, required_fields = []):
         editor = os.environ.get('EDITOR')

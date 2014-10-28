@@ -19,7 +19,7 @@ class UserCommand(BaseCommand):
         print 'kanc user remove {user_id_1} {user_id_2} ... - remove users'
         print ''
     
-    def action(self, subcmd, args):
+    def action(self, subcmd, opts, args):
         if subcmd is None:
             raise CommandError('Subcommand not specified')
 

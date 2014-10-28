@@ -19,7 +19,7 @@ class ProjectCommand(BaseCommand):
         print 'kanc project remove {project_id} {project_id} - remove projects'
         print ''
     
-    def action(self, subcmd, args):
+    def action(self, subcmd, opts, args):
         if subcmd == 0:
             raise CommandError('Subcommand not specified')
 
