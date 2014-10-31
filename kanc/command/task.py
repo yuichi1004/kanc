@@ -125,14 +125,19 @@ class TaskCommand(BaseCommand):
         elif subcmd == 'open':
             if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[0])
-            self.client.open_task(task_id)
+            for t in args:
+                task_id = int(t)
+                if not self.client.open_task(task_id):
+                    raise CommandError('could not open task')
 
         elif subcmd == 'close':
             if len(args) < 1:
                 raise CommandError('task_id not specified')
-            task_id = int(args[0])
-            self.client.close_task(task_id)
+            for t in args:
+                task_id = int(t)
+                if not self.client.close_task(task_id):
+                    raise CommandError('could not close task')
+        
         else:
             raise CommandError('Unknown subcommand specified')
 
