@@ -57,7 +57,7 @@ class UserCommand(BaseCommand):
         elif subcmd == 'remove':
             if len(args) < 1:
                 raise CommandError('user_id not specified')
-            for u in args[0:]:
+            for u in args:
                 user_id = int(u)
                 if not self.client.remove_user(user_id):
                     raise CommandError('could not delete user')

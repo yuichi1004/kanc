@@ -91,7 +91,7 @@ class TaskCommand(BaseCommand):
         elif subcmd == 'remove':
             if len(args) < 1:
                 raise CommandError('task_id not specified')
-            for t in args[1:]:
+            for t in args:
                 task_id = int(t)
                 if not self.client.remove_task(task_id):
                     raise CommandError('could not delete task')
