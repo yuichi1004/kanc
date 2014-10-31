@@ -40,7 +40,10 @@ class UserCommand(BaseCommand):
 
         elif subcmd == 'create':
             user = self.client.create_empty_params('createUser')
-            user = self.edit_attr(user, ['username'])
+            user = self.edit_attr(user, ['username', 'password'])
+            if user is not None and len(user['password']) < 6:
+                print "Error: Password needs to 6 characters at least"
+                raise CommandError("Password needs to 6 characters at least")
             if user is not None:
                 self.client.create_user(**user)
 
