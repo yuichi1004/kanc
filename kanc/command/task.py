@@ -1,5 +1,6 @@
 from base import BaseCommand
 from base import CommandError
+from ..selectors import Selector
 
 class TaskCommand(BaseCommand):
     name = 'task'
@@ -24,7 +25,7 @@ class TaskCommand(BaseCommand):
     
     def getopt_args(self, subcmd):
         if subcmd == 'list':
-            return 'la'
+            return 'lac:'
         return ''
     
     def find_col(self, project_id, col_name):
@@ -37,23 +38,36 @@ class TaskCommand(BaseCommand):
         return col
     
     def action(self, subcmd, opts, args):
+        selector = Selector(self.client)
+
         if subcmd is None:
             raise CommandError('Subcommand not specified')
 
         if subcmd == 'list':
             detailed_list = False
             show_closed = False
+            column_filter = None
             for o in opts:
                 if o[0] == '-l':
                     detailed_list = True
                 if o[0] == '-a':
                     show_closed = True
+                if o[0] == '-c':
+                    column_filter = o[1]
+
+            exp = "*"
+            if len(args) > 0:
+                exp = args[0]
             project_id = int(self.rcfile.get('currentProject'))
-            tasks = self.client.get_all_tasks(project_id, 1)
+
+            tasks = []
             if show_closed:
-                for closed_task in self.client.get_all_tasks(project_id, 0):
-                    tasks.append(closed_task)
+                tasks = selector.select_tasks(exp, project_id, [0, 1])
+            else:
+                tasks = selector.select_tasks(exp, project_id, [1])
+            
             tasks = sorted(tasks, key=lambda t: int(t['id']))
+
             if detailed_list:
                 users = self.client.get_all_users()
                 columns = self.client.get_columns(project_id)
